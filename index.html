@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Automation Framework - Portfólio Interativo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config & Custom CSS -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#f5f5f4', // stone-100 (Warm neutral bg)
+                            DEFAULT: '#292524', // stone-800 (Text)
+                            accent: '#0d9488', // teal-600 (Subtle highlight)
+                            secondary: '#0369a1', // sky-700 (Banking/Tech secondary)
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f5f5f4;
+            color: #292524;
+            scroll-behavior: smooth;
+        }
+
+        /* Chart Container Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Scrollbar for Terminal */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #475569; 
+            border-radius: 4px;
+        }
+
+        /* Interactive Card Hover Effects */
+        .arch-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .arch-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #0d9488;
+        }
+
+        /* Tree view styles */
+        .tree-list ul {
+            padding-left: 20px;
+            border-left: 1px dashed #64748b;
+            margin-left: 10px;
+            display: none; /* Hidden by default for interaction */
+        }
+        .tree-list ul.active {
+            display: block;
+        }
+        .tree-list li {
+            margin: 8px 0;
+            position: relative;
+        }
+        .tree-list li::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: -20px;
+            width: 15px;
+            border-top: 1px dashed #64748b;
+        }
+        .folder-toggle {
+            cursor: pointer;
+            color: #0ea5e9;
+            user-select: none;
+        }
+        .folder-toggle:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Chosen Palette: Warm Neutrals (Stone) with Teal and Sky Blue accents for a calm, professional, and technical aesthetic. -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero/Intro: Establishes context (Author, NDA constraint, Purpose) immediately.
+         2. Architecture Explorer: Interactive grid to break down technical concepts (POM, DDT) into digestible pieces without overwhelming text.
+         3. Tech Stack Dashboard: Uses Chart.js to visualize tool proficiency/categorization dynamically.
+         4. Execution & Structure Workspace: A tabbed interface mimicking a developer's environment (Terminal vs IDE file explorer) to show practical application.
+         Why: This structure moves the user from high-level context -> conceptual architecture -> technical tools -> practical implementation, mimicking the logical flow of understanding a new software framework. -->
+
+    <!-- Visualization & Content Choices:
+         - Arch Concepts -> Goal: Inform/Organize -> Viz: Interactive Flip/Expand Cards (HTML/CSS/JS) -> Justification: Breaks down dense text into interactive learning bites.
+         - Tech Stack -> Goal: Categorize/Compare -> Viz: Radar Chart (Chart.js) -> Justification: Shows balance across Web, API, and CI/CD domains visually. NO SVG used.
+         - Directory -> Goal: Organize/Hierarchies -> Viz: Interactive Collapsible List (HTML/JS) -> Justification: Mimics a real IDE experience for developers reviewing the repo. -->
+         
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-brand-light/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-brand-accent text-2xl"></i>
+                    <span class="font-bold text-xl tracking-tight text-brand">QA Framework</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#sobre" class="text-stone-600 hover:text-brand-accent transition-colors font-medium">Sobre</a>
+                    <a href="#arquitetura" class="text-stone-600 hover:text-brand-accent transition-colors font-medium">Arquitetura</a>
+                    <a href="#stack" class="text-stone-600 hover:text-brand-accent transition-colors font-medium">Stack Técnica</a>
+                    <a href="#workspace" class="text-stone-600 hover:text-brand-accent transition-colors font-medium">Workspace</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-24">
+
+        <!-- 1. Hero / Sobre Section -->
+        <section id="sobre" class="pt-10">
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-center">
+                    <div class="md:col-span-2 space-y-6">
+                        <div class="inline-block bg-brand-secondary/10 text-brand-secondary px-3 py-1 rounded-full text-sm font-semibold tracking-wide uppercase">
+                            Portfólio de Demonstração
+                        </div>
+                        <h1 class="text-4xl md:text-5xl font-bold text-brand leading-tight">
+                            Engenharia de Qualidade & <br> Automação de Testes
+                        </h1>
+                        <p class="text-lg text-stone-600 leading-relaxed">
+                            Este ambiente interativo demonstra as melhores práticas de mercado que utilizo no meu dia a dia. Devido a rigorosos acordos de confidencialidade (NDA) em meus <strong>6 anos de atuação no setor bancário (Bradesco)</strong>, códigos reais de produção não podem ser expostos. Este framework testa aplicações públicas para comprovar proficiência arquitetural.
+                        </p>
+                        <div class="pt-4 flex flex-wrap gap-4">
+                            <span class="flex items-center gap-2 text-sm text-stone-700 bg-stone-100 px-4 py-2 rounded-lg border border-stone-200">
+                                <i class="fa-solid fa-user-check text-brand-accent"></i> Silvana Gomes
+                            </span>
+                            <span class="flex items-center gap-2 text-sm text-stone-700 bg-stone-100 px-4 py-2 rounded-lg border border-stone-200">
+                                <i class="fa-solid fa-certificate text-brand-accent"></i> Especialista CPA-20
+                            </span>
+                            <a href="https://www.linkedin.com/in/silvana-gomes-qa" target="_blank" class="flex items-center gap-2 text-sm text-white bg-[#0077b5] hover:bg-[#005582] transition-colors px-4 py-2 rounded-lg">
+                                <i class="fa-brands fa-linkedin"></i> LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex justify-center">
+                        <div class="w-64 h-64 bg-stone-100 rounded-full flex items-center justify-center border-8 border-white shadow-lg relative">
+                            <i class="fa-solid fa-shield-halved text-8xl text-stone-300 absolute"></i>
+                            <div class="z-10 text-center">
+                                <i class="fa-solid fa-check-double text-4xl text-brand-accent mb-2"></i>
+                                <div class="font-bold text-brand">Quality</div>
+                                <div class="text-sm text-stone-500">Assured</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Architecture Section -->
+        <section id="arquitetura" class="scroll-mt-20">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-brand mb-4">Arquitetura e Padrões de Projeto</h2>
+                <p class="text-stone-600">
+                    O framework foi estruturado focando em escalabilidade, fácil manutenção e execução rápida em esteiras de CI/CD. Clique nos cards para explorar os conceitos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Card 1 -->
+                <div class="arch-card bg-white p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden group" onclick="toggleDetails('pom-details')">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-brand-secondary/5 rounded-bl-full flex items-start justify-end p-3">
+                        <i class="fa-solid fa-sitemap text-brand-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand mb-2">Page Object Model (POM)</h3>
+                    <p class="text-stone-500 text-sm mb-4">Padrão de design para estruturação de testes de UI.</p>
+                    <div id="pom-details" class="hidden text-stone-700 text-sm bg-stone-50 p-4 rounded-lg border border-stone-100 mt-2">
+                        Separação clara entre a lógica de negócio (ações na página) e os scripts de teste. Facilita enormemente a manutenção caso mapeamentos de tela ou seletores mudem, evitando refatoração em massa.
+                    </div>
+                    <div class="text-brand-accent text-xs font-semibold mt-4 flex items-center gap-1 group-hover:text-brand-secondary transition-colors">
+                        <i class="fa-solid fa-hand-pointer"></i> Clique para expandir
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="arch-card bg-white p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden group" onclick="toggleDetails('ddt-details')">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-brand-accent/5 rounded-bl-full flex items-start justify-end p-3">
+                        <i class="fa-solid fa-database text-brand-accent"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand mb-2">Data-Driven Testing (DDT)</h3>
+                    <p class="text-stone-500 text-sm mb-4">Injeção dinâmica de massas de dados.</p>
+                    <div id="ddt-details" class="hidden text-stone-700 text-sm bg-stone-50 p-4 rounded-lg border border-stone-100 mt-2">
+                        Uso de arquivos <code>fixtures</code> (formato JSON) para separar os dados de teste do código. Permite rodar o mesmo cenário de teste múltiplas vezes com diferentes conjuntos de dados de forma ágil.
+                    </div>
+                    <div class="text-brand-accent text-xs font-semibold mt-4 flex items-center gap-1 group-hover:text-brand-secondary transition-colors">
+                        <i class="fa-solid fa-hand-pointer"></i> Clique para expandir
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="arch-card bg-white p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden group" onclick="toggleDetails('shift-details')">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-bl-full flex items-start justify-end p-3">
+                        <i class="fa-solid fa-arrow-left text-amber-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand mb-2">Shift-Left Testing</h3>
+                    <p class="text-stone-500 text-sm mb-4">Antecipação da qualidade no ciclo de vida.</p>
+                    <div id="shift-details" class="hidden text-stone-700 text-sm bg-stone-50 p-4 rounded-lg border border-stone-100 mt-2">
+                        Testes de API isolados rodando antes dos testes de UI para feedback rápido (Fail Fast). Identifica problemas na lógica de backend e integrações antes mesmo da interface gráfica estar pronta.
+                    </div>
+                    <div class="text-brand-accent text-xs font-semibold mt-4 flex items-center gap-1 group-hover:text-brand-secondary transition-colors">
+                        <i class="fa-solid fa-hand-pointer"></i> Clique para expandir
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="arch-card bg-white p-6 rounded-xl border border-stone-200 shadow-sm relative overflow-hidden group" onclick="toggleDetails('cmd-details')">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-purple-500/5 rounded-bl-full flex items-start justify-end p-3">
+                        <i class="fa-solid fa-terminal text-purple-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand mb-2">Custom Commands</h3>
+                    <p class="text-stone-500 text-sm mb-4">Encapsulamento de rotinas complexas.</p>
+                    <div id="cmd-details" class="hidden text-stone-700 text-sm bg-stone-50 p-4 rounded-lg border border-stone-100 mt-2">
+                        Criação de comandos customizados para ações repetitivas (como Login sistêmico, Geração de Token Auth, Setup de Massa). Mantém os arquivos de teste (specs) limpos e focados no comportamento.
+                    </div>
+                    <div class="text-brand-accent text-xs font-semibold mt-4 flex items-center gap-1 group-hover:text-brand-secondary transition-colors">
+                        <i class="fa-solid fa-hand-pointer"></i> Clique para expandir
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Tech Stack Section (Chart.js) -->
+        <section id="stack" class="scroll-mt-20">
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <div class="p-8 md:p-12 border-b lg:border-b-0 lg:border-r border-stone-100 flex flex-col justify-center">
+                        <h2 class="text-3xl font-bold text-brand mb-4">Stack Tecnológica</h2>
+                        <p class="text-stone-600 mb-8">
+                            Ferramentas e linguagens integradas para garantir uma cobertura abrangente, desde a interface do usuário até os contratos de dados em background.
+                        </p>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-bold flex items-center gap-2 text-stone-800"><i class="fa-solid fa-desktop text-brand-secondary w-5"></i> Web/UI Automation</h4>
+                                <p class="text-sm text-stone-500 mt-1">Cypress, Playwright (JS/TS), Allure/MochaAwesome para reports.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold flex items-center gap-2 text-stone-800"><i class="fa-solid fa-server text-brand-accent w-5"></i> API Automation</h4>
+                                <p class="text-sm text-stone-500 mt-1">REST Assured, Postman (Newman). Validação de JSON Schema e Status Code.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold flex items-center gap-2 text-stone-800"><i class="fa-solid fa-code-merge text-purple-600 w-5"></i> CI/CD Pipeline</h4>
+                                <p class="text-sm text-stone-500 mt-1">GitHub Actions rodando testes automaticamente via PR ou Push na branch principal.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8 bg-stone-50 flex items-center justify-center">
+                        <!-- Chart Container Requirement implemented here -->
+                        <div class="chart-container">
+                            <canvas id="stackChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Execution Workspace (Terminal & Files) -->
+        <section id="workspace" class="scroll-mt-20 pb-20">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h2 class="text-3xl font-bold text-brand mb-4">Workspace & Execução</h2>
+                <p class="text-stone-600">
+                    Explore como estruturamos o projeto e os comandos essenciais para execução em ambiente local ou CI.
+                </p>
+            </div>
+
+            <div class="bg-[#1e293b] rounded-xl shadow-xl overflow-hidden border border-slate-700">
+                <!-- Mac-like Header -->
+                <div class="bg-[#0f172a] px-4 py-3 flex items-center gap-2 border-b border-slate-700">
+                    <div class="flex gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div class="flex-1 flex justify-center">
+                        <!-- Tabs -->
+                        <div class="flex gap-1 bg-[#1e293b] p-1 rounded-lg">
+                            <button onclick="switchTab('terminal')" id="btn-terminal" class="px-4 py-1 text-xs font-mono rounded-md bg-slate-700 text-white transition-colors">Comandos</button>
+                            <button onclick="switchTab('files')" id="btn-files" class="px-4 py-1 text-xs font-mono rounded-md text-slate-400 hover:text-white transition-colors">Estrutura (Tree)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal View -->
+                <div id="view-terminal" class="p-6 font-mono text-sm h-96 overflow-y-auto terminal-scroll text-slate-300">
+                    <div class="mb-6">
+                        <div class="text-slate-500 mb-1"># 1. Clone o repositório</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">➜</span>
+                            <span class="text-blue-300">~</span>
+                            <span class="text-white">git clone https://github.com/seu-usuario/qa-automation-framework.git</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="text-slate-500 mb-1"># 2. Instale as dependências</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">➜</span>
+                            <span class="text-blue-300">~</span>
+                            <span class="text-white">npm install</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="text-slate-500 mb-1"># 3. Execução Headless (Background / CI)</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">➜</span>
+                            <span class="text-blue-300">~</span>
+                            <span class="text-white">npx cypress run</span>
+                        </div>
+                        <div class="text-slate-400 mt-2 text-xs opacity-70">
+                            > Running:  test-suite.cy.js (1 of 1)<br>
+                            > ✓ Login API validates token (120ms)<br>
+                            > ✓ UI renders dashboard correctly (850ms)<br>
+                            > All specs passed!
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="text-slate-500 mb-1"># 4. Execução Visual (Interface de Testes)</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">➜</span>
+                            <span class="text-blue-300">~</span>
+                            <span class="text-white">npx cypress open</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Tree View (Hidden initially) -->
+                <div id="view-files" class="p-6 font-mono text-sm h-96 overflow-y-auto terminal-scroll text-slate-300 hidden">
+                    <div class="text-slate-500 mb-4">/* Explore a arquitetura de pastas do Framework */</div>
+                    
+                    <div class="tree-list">
+                        <div class="flex items-center gap-2 font-bold text-white mb-2">
+                            <i class="fa-solid fa-box text-amber-600"></i> qa-automation-framework
+                        </div>
+                        <ul class="active ml-4">
+                            <li>
+                                <div class="flex items-center gap-2 folder-toggle" onclick="toggleFolder('f-cypress', this)">
+                                    <i class="fa-solid fa-folder-open text-sky-400"></i> cypress
+                                </div>
+                                <ul id="f-cypress" class="active">
+                                    <li>
+                                        <div class="flex items-center gap-2 folder-toggle" onclick="toggleFolder('f-e2e', this)">
+                                            <i class="fa-solid fa-folder text-sky-400"></i> e2e <span class="text-xs text-slate-500 ml-2"># Cenários de teste</span>
+                                        </div>
+                                        <ul id="f-e2e">
+                                            <li class="flex items-center gap-2 text-slate-300"><i class="fa-brands fa-js text-yellow-400"></i> login.cy.js</li>
+                                            <li class="flex items-center gap-2 text-slate-300"><i class="fa-brands fa-js text-yellow-400"></i> transactions.cy.js</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center gap-2 folder-toggle" onclick="toggleFolder('f-fix', this)">
+                                            <i class="fa-solid fa-folder text-sky-400"></i> fixtures <span class="text-xs text-slate-500 ml-2"># Massa de dados (DDT)</span>
+                                        </div>
+                                        <ul id="f-fix">
+                                            <li class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-code text-green-400"></i> users.json</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center gap-2 folder-toggle" onclick="toggleFolder('f-sup', this)">
+                                            <i class="fa-solid fa-folder text-sky-400"></i> support <span class="text-xs text-slate-500 ml-2"># Custom Commands & POM</span>
+                                        </div>
+                                        <ul id="f-sup">
+                                            <li class="flex items-center gap-2 text-slate-300"><i class="fa-brands fa-js text-yellow-400"></i> commands.js</li>
+                                            <li class="flex items-center gap-2 text-slate-300"><i class="fa-brands fa-js text-yellow-400"></i> pages/loginPage.js</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="flex items-center gap-2 text-slate-300">
+                                            <i class="fa-solid fa-folder text-sky-400"></i> reports <span class="text-xs text-slate-500 ml-2"># Relatórios gerados</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="flex items-center gap-2 text-slate-300 mt-2">
+                                <i class="fa-brands fa-js text-yellow-400"></i> cypress.config.js <span class="text-xs text-slate-500 ml-2"># Configurações base (BaseURL)</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-slate-300">
+                                <i class="fa-brands fa-npm text-red-500"></i> package.json <span class="text-xs text-slate-500 ml-2"># Dependências do Node.js</span>
+                            </li>
+                            <li class="flex items-center gap-2 text-slate-300">
+                                <i class="fa-brands fa-markdown text-blue-300"></i> README.md
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-brand text-brand-light py-8 border-t border-stone-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-sm text-stone-400">
+                Desenvolvido como portfólio técnico por <strong class="text-white">Silvana Gomes</strong>.<br>
+                Especialista em QA & Automação | CPA-20.
+            </p>
+            <div class="mt-4 flex justify-center gap-4">
+                <a href="mailto:silgomes18@gmail.com" class="text-stone-400 hover:text-white transition-colors"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/silvana-gomes-qa" target="_blank" class="text-stone-400 hover:text-white transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 1. Interaction Logic: Architecture Cards Toggle
+        function toggleDetails(elementId) {
+            const el = document.getElementById(elementId);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                el.classList.add('block');
+            } else {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            }
+        }
+
+        // 2. State Management & Navigation: Workspace Tabs
+        function switchTab(tabName) {
+            const termView = document.getElementById('view-terminal');
+            const fileView = document.getElementById('view-files');
+            const btnTerm = document.getElementById('btn-terminal');
+            const btnFiles = document.getElementById('btn-files');
+
+            if (tabName === 'terminal') {
+                termView.classList.remove('hidden');
+                fileView.classList.add('hidden');
+                
+                btnTerm.classList.replace('text-slate-400', 'text-white');
+                btnTerm.classList.add('bg-slate-700');
+                
+                btnFiles.classList.replace('text-white', 'text-slate-400');
+                btnFiles.classList.remove('bg-slate-700');
+            } else {
+                fileView.classList.remove('hidden');
+                termView.classList.add('hidden');
+                
+                btnFiles.classList.replace('text-slate-400', 'text-white');
+                btnFiles.classList.add('bg-slate-700');
+                
+                btnTerm.classList.replace('text-white', 'text-slate-400');
+                btnTerm.classList.remove('bg-slate-700');
+            }
+        }
+
+        // 3. File Tree Interaction
+        function toggleFolder(folderId, element) {
+            const folder = document.getElementById(folderId);
+            const icon = element.querySelector('i');
+            
+            if (folder.classList.contains('active')) {
+                folder.classList.remove('active');
+                icon.classList.remove('fa-folder-open');
+                icon.classList.add('fa-folder');
+            } else {
+                folder.classList.add('active');
+                icon.classList.remove('fa-folder');
+                icon.classList.add('fa-folder-open');
+            }
+        }
+
+        // 4. Data Visualization: Chart.js Radar Chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('stackChart').getContext('2d');
+            
+            // Core data extracted from the README
+            const stackData = {
+                labels: [
+                    'Web UI (Cypress/Playwright)', 
+                    'API (REST Assured/Postman)', 
+                    'Integração Contínua (CI/CD)', 
+                    'JavaScript/TypeScript', 
+                    'Padrões (POM/DDT)',
+                    'Contratos (JSON Schema)'
+                ],
+                datasets: [{
+                    label: 'Áreas de Cobertura do Framework',
+                    data: [90, 85, 80, 85, 95, 80],
+                    backgroundColor: 'rgba(13, 148, 136, 0.2)', // brand-accent with opacity
+                    borderColor: 'rgba(13, 148, 136, 1)',
+                    pointBackgroundColor: 'rgba(3, 105, 161, 1)', // brand-secondary
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(3, 105, 161, 1)',
+                    borderWidth: 2,
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: stackData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for custom container sizing
+                    plugins: {
+                        legend: {
+                            display: false // Hide legend for cleaner look
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ' (Foco)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 11
+                                },
+                                color: '#444'
+                            },
+                            ticks: {
+                                display: false, // Hide numeric scale for abstract representation
+                                min: 0,
+                                max: 100
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
