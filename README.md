@@ -11,7 +11,8 @@ Portfólio demonstrativo de Engenharia de Qualidade: Arquitetura de testes autom
 Instale as dependências:npm install
 Para rodar os testes em modo Headless (background):npx cypress run
 Para abrir a interface visual de testes:npx cypress open
-📊 Estrutura de Diretórios📦 qa-automation-framework
+📊Estrutura de Diretórios📦 qa-automation-framework
+
 
  ┣ 📂 cypress
  ┃ ┣ 📂 e2e            # Cenários de teste organizados por funcionalidade
