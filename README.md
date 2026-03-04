@@ -1,4 +1,4 @@
-🚀 QA Automation Framework - Portfólio
+🚀 QA Automation Framework - Portfólio - https://silvanaqa.github.io/portfolio-automacao-qa/
 💡 Clique no botão azul acima para visualizar o dashboard interativo deste portfólio, que inclui a arquitetura detalhada, a stack técnica e a estrutura de diretórios do projeto.
 
 📌 Sobre o Projeto
